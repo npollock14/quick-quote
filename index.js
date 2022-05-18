@@ -15,13 +15,14 @@ async function handleRequest(request) {
       statusText: 'Bad Request',
     })
   }
-  let res = await fetch(`https://finance.yahoo.com/quote/${symbol}/`)
-  // let data = await res.text()
-  //get the body of the response
-  let body = await res.text()
-  // console.log(body)
   let price = -1
   try {
+    let res = await fetch(`https://finance.yahoo.com/quote/${symbol}/`)
+    // let data = await res.text()
+    //get the body of the response
+    let body = await res.text()
+    // console.log(body)
+
     price = body
       .split(`"${symbol}":{"sourceInterval"`)[1]
       .split('regularMarketPrice')[1]
@@ -38,7 +39,10 @@ async function handleRequest(request) {
   } catch (err) {
     console.log(err)
     price = -1
-    return -1
+    return new Response('Error', {
+      status: 500,
+      statusText: 'Internal Server Error',
+    })
   }
 
   return new Response(price, {
