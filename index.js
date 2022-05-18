@@ -6,16 +6,24 @@ addEventListener('fetch', event => {
  * @param {Request} request
  */
 async function handleRequest(request) {
-  let res = await fetch('https://finance.yahoo.com/quote/AAPL')
+  //get the stock symbol from the url
+  const url = new URL(request.url)
+  const symbol = url.searchParams.get('s')
+  if (!symbol) {
+    return new Response('No symbol provided', {
+      status: 400,
+      statusText: 'Bad Request',
+    })
+  }
+  let res = await fetch(`https://finance.yahoo.com/quote/${symbol}/`)
   // let data = await res.text()
   //get the body of the response
   let body = await res.text()
   // console.log(body)
-  let ticker = 'TSLA'
   let price = -1
   try {
     price = body
-      .split(`"${ticker}":{"sourceInterval"`)[1]
+      .split(`"${symbol}":{"sourceInterval"`)[1]
       .split('regularMarketPrice')[1]
       .split('fmt":"')[1]
       .split('"')[0]
