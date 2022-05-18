@@ -13,6 +13,11 @@ async function handleRequest(request) {
     return new Response('No symbol provided', {
       status: 400,
       statusText: 'Bad Request',
+      //allow CORS
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Content-Type': 'text/plain',
+      },
     })
   }
   let price = -1
@@ -42,10 +47,19 @@ async function handleRequest(request) {
     return new Response('Error', {
       status: 500,
       statusText: 'Internal Server Error',
+      //allow CORS
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Content-Type': 'text/plain',
+      },
     })
   }
 
   return new Response(price, {
-    headers: { 'content-type': 'text/plain' },
+    //allow CORS
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Content-Type': 'text/plain',
+    },
   })
 }
