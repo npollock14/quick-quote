@@ -20,13 +20,12 @@ async function handleRequest(request) {
       },
     })
   }
-  let price = -1
+  let json = [{}]
   try {
     let res = await fetch(`https://finance.yahoo.com/quote/${symbol}/`)
     // let data = await res.text()
     //get the body of the response
     let body = await res.text()
-    // console.log(body)
 
     price = body
       .split(`"${symbol}":{"sourceInterval"`)[1]
@@ -34,16 +33,18 @@ async function handleRequest(request) {
       .split('fmt":"')[1]
       .split('"')[0]
 
-    price = parseFloat(price.replace(',', ''))
-
-    const currencyMatch = body.match(/Currency in ([A-Za-z]{3})/)
-    let currency = null
-    if (currencyMatch) {
-      currency = currencyMatch[1]
-    }
+    let jsonArea = body
+      .split(`"${symbol}":{"sourceInterval"`)[1]
+      .split('sourceInterval')[0]
+    let index = jsonArea.indexOf(',')
+    jsonArea = jsonArea.substring(index + 1)
+    index = jsonArea.lastIndexOf(',')
+    jsonArea = jsonArea.substring(0, index)
+    jsonArea = '[{' + jsonArea + ']'
+    // json = JSON.parse(jsonArea)
+    json = jsonArea
   } catch (err) {
     console.log(err)
-    price = -1
     return new Response('Error', {
       status: 500,
       statusText: 'Internal Server Error',
@@ -55,11 +56,11 @@ async function handleRequest(request) {
     })
   }
 
-  return new Response(price, {
+  return new Response(json, {
     //allow CORS
     headers: {
       'Access-Control-Allow-Origin': '*',
-      'Content-Type': 'text/plain',
+      'Content-Type': 'application/json',
     },
   })
 }
